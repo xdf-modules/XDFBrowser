@@ -31,10 +31,7 @@ class IOException : public std::exception {
 	public:
         const char * description;
         IOException(const char * description): description(description) {}
-	virtual const char* what() const throw()
-	{
-		return description;
-	}
+	virtual const char* what() const noexcept;
 };
 
 
@@ -70,7 +67,7 @@ public:
 
 	virtual void writeChunk(QDataStream &out)=0;
 
-	virtual ~XDFChunk(){};
+	virtual ~XDFChunk();
 };
 
 class FileHeaderChunk : public XDFChunk
@@ -225,7 +222,7 @@ public:
 
 	~XDFfile() {
 		file.close();	
-	};
+	}
 
     void open(QProgressBar *progressBar);
 

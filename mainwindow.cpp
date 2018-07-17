@@ -1,39 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "stdio.h"
-#ifdef __WIN32
-#include "windows.h"
-#endif
 #include <QFileDialog>
 #include <QThread>
 #include <QMessageBox>
 
 #include "xdffile.h"
-
-#ifdef __WIN32
-void OpenConsole() {
-     // create the console
-    if(AllocConsole()) {
-        freopen("CONOUT$", "w", stdout);
-        SetConsoleTitle(L"Debug Console");
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED);
-
-		
-    }
-
-
-
-}
-
-
-
-void CloseConsole() {
-    FreeConsole();
-    fclose(stdout);
-}
-#endif
-
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -41,20 +13,11 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 	connect(ui->textEdit, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
-
-#ifdef __WIN32
-    OpenConsole();
-#endif
 }
-
-
 
 MainWindow::~MainWindow()
 {
     delete ui;
-#ifdef __WIN32
-    CloseConsole();
-#endif
 }
 
 void MainWindow::handleSelectionChanged(const QItemSelection& selection) {
@@ -149,7 +112,7 @@ void MainWindow::on_actionClose_triggered()
 }
 
 void MainWindow::errorDialog(QString errorMessage) {
-	QMessageBox::critical(nullptr, tr("Error"), errorMessage);
+	QMessageBox::critical(this, tr("Error"), errorMessage);
 }
 
 

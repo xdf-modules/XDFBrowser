@@ -29,8 +29,11 @@ QString XDFChunk::readString(QDataStream &in, size_t length) {
 	return str;
 }
 
+XDFChunk::~XDFChunk()
+{
+}
 
-	
+
 void XDFChunk::writeChunk(QDataStream &out){
 	quint8 chunkLengthByte = 0;
 	quint32 chunkLengthInt = 0;
@@ -130,14 +133,14 @@ Samples Chunk Implementation
 
 *********************************************************************/
 
-SamplesChunk::SamplesChunk(QDataStream &in, quint64 chunkPosition, qint8 numLengthBytes, quint64 chunkLength, bool loadData) : XDFChunk(chunkPosition, numLengthBytes, chunkLength), chunkData(NULL) {
+SamplesChunk::SamplesChunk(QDataStream &in, quint64 chunkPosition, qint8 numLengthBytes, quint64 chunkLength, bool loadData) : XDFChunk(chunkPosition, numLengthBytes, chunkLength), chunkData(nullptr) {
 	if(loadData) {
 		chunkData =  (char *) malloc(chunkLength-2);
 
 		in.readRawData(chunkData, chunkLength-2);
 		loaded = true;
 	} else {
-		chunkData = NULL;
+		chunkData = nullptr;
 		in.skipRawData(chunkLength-2);
 		loaded = false;
 	}
@@ -169,7 +172,6 @@ quint64 SamplesChunk::loadData(QFile &file) {
 	qint8 numLengthBytes;
 	in >> numLengthBytes;
 
-	thisChunkLength;
 	switch(numLengthBytes){
 		case 1:
 			quint8 chunkLengthByte;
@@ -188,7 +190,6 @@ quint64 SamplesChunk::loadData(QFile &file) {
 			break;
 		default:
 			throw IOException("XDF File is incorrectly formatted: numLengthBytes is an illegal value.\n");
-			break;
 	}
 	quint16 tagNumber;
 	in >> tagNumber;
@@ -204,14 +205,14 @@ quint64 SamplesChunk::loadData(QFile &file) {
 
 quint64 SamplesChunk::unloadData() {
 	if(chunkData) free(chunkData);
-	chunkData = NULL;
+	chunkData = nullptr;
 	loaded = false;
 	return thisChunkLength;
 }
 
 SamplesChunk::~SamplesChunk(){
 	if(chunkData) free(chunkData);
-	chunkData = NULL;
+	chunkData = nullptr;
 }
 
 /********************************************************************
@@ -261,7 +262,7 @@ Boundary Chunk Implementation
 *********************************************************************/
 
 
-BoundaryChunk::BoundaryChunk(QDataStream &in, quint64 chunkPosition, qint8 numLengthBytes, quint64 chunkLength) : XDFChunk(chunkPosition, numLengthBytes, chunkLength), chunkData(NULL) {
+BoundaryChunk::BoundaryChunk(QDataStream &in, quint64 chunkPosition, qint8 numLengthBytes, quint64 chunkLength) : XDFChunk(chunkPosition, numLengthBytes, chunkLength), chunkData(nullptr) {
 	chunkData =  (quint8 *) malloc(chunkLength-2);
 	for(int i=0; i<chunkLength-2; i++) {
 		in >> chunkData[i];
@@ -308,7 +309,7 @@ void BoundaryChunk::writeChunk(QDataStream &out) {
 
 BoundaryChunk::~BoundaryChunk(){
 	if(chunkData) free(chunkData);
-	chunkData = NULL;
+	chunkData = nullptr;
 }
 
 
@@ -353,7 +354,7 @@ Unrecognized Chunk Implementation
 
 *********************************************************************/
 
-UnrecognizedChunk::UnrecognizedChunk(QDataStream &in, quint64 chunkPosition, qint8 numLengthBytes, quint64 chunkLength, quint16 chunkTag) : XDFChunk(chunkPosition, numLengthBytes, chunkLength), chunkData(NULL){
+UnrecognizedChunk::UnrecognizedChunk(QDataStream &in, quint64 chunkPosition, qint8 numLengthBytes, quint64 chunkLength, quint16 chunkTag) : XDFChunk(chunkPosition, numLengthBytes, chunkLength), chunkData(nullptr){
 	chunkData =  (char *) malloc(chunkLength-2);
 	thisChunkTag = chunkTag;
 
@@ -380,7 +381,7 @@ void UnrecognizedChunk::writeChunk(QDataStream &out) {
 
 UnrecognizedChunk::~UnrecognizedChunk(){
 	if(chunkData) free(chunkData);
-	chunkData = NULL;
+	chunkData = nullptr;
 }
 
  
@@ -402,7 +403,6 @@ void XDFfile::open(QProgressBar *progressBar)  {
 	buf[4] = 0;
 	if(QString(buf).compare(QString("XDF:"))){
 		throw IOException("File is not an XDF file\n");
-		return; 
 	} else {
 		int count = 0;
 		while(true) {
@@ -431,7 +431,6 @@ void XDFfile::open(QProgressBar *progressBar)  {
 					break;
 				default:
 					throw IOException("XDFFile is incorrectly formatted: numLengthBytes is an illegal value.\n");
-					break;
 			}
 			quint16 tagNumber;
 			in >> tagNumber;
@@ -580,6 +579,7 @@ void XDFfile::setChunkText(int element, const QString& text) {
 }
 
 
-
-
-
+const char*IOException::what() const noexcept
+{
+	return description;
+}
