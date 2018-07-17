@@ -30,7 +30,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
     
 public:
-	explicit MainWindow(QWidget *parent = nullptr);
+	explicit MainWindow(QWidget *parent = nullptr, const char* filename = nullptr);
     ~MainWindow();
 
 
@@ -47,7 +47,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
     std::shared_ptr<XDFfile> xdfFile;
-    std::shared_ptr<StringList> chunkNameList;
+	std::shared_ptr<StringList> chunkNameList;
+	void loadfile(QString xdfFileName);
 };
 
   class OpenerThread : public QThread

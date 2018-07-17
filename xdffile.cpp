@@ -153,7 +153,7 @@ QString SamplesChunk::getName() {
 }
 
 QString SamplesChunk::getText() {
-	return QString("Binary Data");
+	return QStringLiteral("Binary Data, %1 bytes").arg(this->thisChunkLength);
 }
 
 void SamplesChunk::setText(const QString& text){}

@@ -7,12 +7,13 @@
 
 #include "xdffile.h"
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent, const char* filename) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 	connect(ui->textEdit, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+	if(filename) loadfile(QString::fromLatin1(filename));
 }
 
 MainWindow::~MainWindow()
@@ -78,7 +79,10 @@ void MainWindow::on_actionOpen_triggered()
 {
 
     QString xdfFileName = QFileDialog::getOpenFileName(this, tr("Open XDF File"), tr("*.xdf"));
+	loadfile(xdfFileName);
+}
 
+void MainWindow::loadfile(QString xdfFileName) {
 	if(!xdfFileName.isNull()) {
 		chunkNameList.reset(new StringList());
 		ui->listView->setModel(chunkNameList.get());
