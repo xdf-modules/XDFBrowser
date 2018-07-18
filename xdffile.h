@@ -110,6 +110,7 @@ class SamplesChunk : public XDFChunk
 {
 public:
 	bool loaded;
+	qint32 streamID;
 	char * chunkData;
 
 	SamplesChunk(QDataStream &in, quint64 chunkPosition, quint64 chunkLength, bool loadData);

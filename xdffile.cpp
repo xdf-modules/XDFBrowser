@@ -42,7 +42,9 @@ quint64 read_varlen_int(QDataStream& in) {
 			in >> chunkLengthLong;
 		    return chunkLengthLong;
 	    default:
-		    throw IOException("XDF File is incorrectly formatted: numLengthBytes is an illegal value: ");
+		    throw std::runtime_error(
+		        "XDF File is incorrectly formatted: numLengthBytes is an illegal value: " +
+		        std::to_string(numLengthBytes));
 	}
 }
 
@@ -167,14 +169,15 @@ Samples Chunk Implementation
 *********************************************************************/
 
 SamplesChunk::SamplesChunk(QDataStream &in, quint64 chunkPosition, quint64 chunkLength, bool loadData) : XDFChunk(chunkPosition, chunkLength), chunkData(nullptr) {
+	in >> streamID;
 	if(loadData) {
-		chunkData =  (char *) malloc(chunkLength-2);
+		chunkData =  (char *) malloc(chunkLength-6);
 
-		in.readRawData(chunkData, chunkLength-2);
+		in.readRawData(chunkData, chunkLength-6);
 		loaded = true;
 	} else {
 		chunkData = nullptr;
-		in.skipRawData(chunkLength-2);
+		in.skipRawData(chunkLength-6);
 		loaded = false;
 	}
 	
@@ -182,11 +185,19 @@ SamplesChunk::SamplesChunk(QDataStream &in, quint64 chunkPosition, quint64 chunk
 
 
 QString SamplesChunk::getName() {
-	return QString("Samples Chunk");
+	if(loaded)
+		return QStringLiteral("Samples Chunk, Stream #%1").arg(streamID);
+	else
+		return QStringLiteral("Samples Chunk");
 }
 
 QString SamplesChunk::getText() {
-	return QStringLiteral("Binary Data, %1 bytes").arg(this->thisChunkLength);
+	if(loaded) {
+		auto text = QStringLiteral("Binary Data, Stream %1, %2 bytes\n\n").arg(streamID).arg(thisChunkLength);
+		return text;
+	}
+	else
+		return QStringLiteral("Binary Data, not loaded");
 }
 
 void SamplesChunk::setText(const QString& text){}
@@ -194,7 +205,8 @@ void SamplesChunk::setText(const QString& text){}
 void SamplesChunk::writeChunk(QDataStream &out) {
 	XDFChunk::writeChunk(out);
 	out << SAMPLES_CHUNK;
-	out.writeRawData(chunkData, thisChunkLength -2);
+	out << streamID;
+	out.writeRawData(chunkData, thisChunkLength - 6);
 
 }
 
@@ -207,10 +219,12 @@ quint64 SamplesChunk::loadData(QFile &file) {
 	quint16 tagNumber;
 	in >> tagNumber;
 
-	if(chunkData) free(chunkData);
-	chunkData =  (char *) malloc(thisChunkLength-2);
+	in >> streamID;
 
-	in.readRawData(chunkData, thisChunkLength-2);
+	if(chunkData) free(chunkData);
+	chunkData =  (char *) malloc(thisChunkLength-6);
+
+	in.readRawData(chunkData, thisChunkLength-6);
 	loaded = true;
 	return thisChunkLength;
 
@@ -419,14 +433,16 @@ void XDFfile::open(QProgressBar *progressBar)  {
 	} else {
 		int count = 0;
 		while(true) {
-			count++;
 			quint64 chunkPosition = file.pos();
+			try {
 			if(chunkPosition >= (quint64) file.size()) break;
 
 			quint64 chunkLength = read_varlen_int(in);
 
+			count++;
 			quint16 tagNumber;
 			in >> tagNumber;
+
 
 			switch(tagNumber){
 				case XDFChunk::FILEHEADER_CHUNK: {
@@ -476,8 +492,11 @@ void XDFfile::open(QProgressBar *progressBar)  {
 					bytesLoaded += chunkLength;
 					break;
 				}
-
-			
+			    }
+			} catch(const std::exception& e) {
+				throw std::runtime_error("Error in chunk loading (chunk #" + std::to_string(count) +
+				                         " starting at byte " + std::to_string(chunkPosition) +
+				                         "): " + e.what());
 			}
 			//update progress bar
 			QMetaObject::invokeMethod(progressBar, "setValue", Qt::QueuedConnection, Q_ARG(int, (chunkPosition*100)/fileSize));

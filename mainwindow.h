@@ -78,7 +78,7 @@ private:
 				chunkNameList->append(xdfFile->getChunkName(i));
 			}
 
-		} catch (const IOException &ex) {
+		} catch (const std::exception &ex) {
 			emit errorMessageSignal(ex.what());
 		}
 
@@ -103,7 +103,7 @@ signals:
      void run() {
 		 try {
 			xdfFile->saveAs(xdfFileName, progressBar);
-		 } catch (const IOException &ex) {
+		 } catch (const std::exception &ex) {
 			emit errorMessageSignal(ex.what());
 		 }
      }
