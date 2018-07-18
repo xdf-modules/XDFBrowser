@@ -48,7 +48,7 @@ public:
 	quint64 thisChunkPosition; //in file
 
 protected:
-	qint8 thisNumLengthBytes;
+	qint8 thisNumLengthBytes();
 	quint64 thisChunkLength;
 
 protected:
@@ -56,8 +56,8 @@ protected:
 
 public:
 
-	XDFChunk(quint64 chunkPosition, qint8 numLengthBytes, quint64 chunkLength) 
-		: thisChunkPosition(chunkPosition), thisNumLengthBytes(numLengthBytes), thisChunkLength(chunkLength) {}
+	XDFChunk(quint64 chunkPosition, quint64 chunkLength)
+	    : thisChunkPosition(chunkPosition), thisChunkLength(chunkLength) {}
 
 	virtual QString getName()=0;
 
@@ -75,7 +75,7 @@ class FileHeaderChunk : public XDFChunk
 public:
 	QString chunkData;
 
-	FileHeaderChunk(QDataStream &in, quint64 chunkPosition, qint8 numLengthBytes, quint64 chunkLength);
+	FileHeaderChunk(QDataStream &in, quint64 chunkPosition, quint64 chunkLength);
 	QString getName();
 
 	QString getText();
@@ -93,7 +93,7 @@ public:
 	QString chunkData;
 	qint32 streamID;
 
-	StreamHeaderChunk(QDataStream &in, quint64 chunkPosition, qint8 numLengthBytes, quint64 chunkLength);
+	StreamHeaderChunk(QDataStream &in, quint64 chunkPosition, quint64 chunkLength);
 	QString getName();
 
 	QString getText();
@@ -112,7 +112,7 @@ public:
 	bool loaded;
 	char * chunkData;
 
-	SamplesChunk(QDataStream &in, quint64 chunkPosition, qint8 numLengthBytes, quint64 chunkLength, bool loadData);
+	SamplesChunk(QDataStream &in, quint64 chunkPosition, quint64 chunkLength, bool loadData);
 
 	QString getName();
 
@@ -136,7 +136,7 @@ public:
 	double collectionTime;
 	double offsetValue;
 
-	ClockOffsetChunk(QDataStream &in, quint64 chunkPosition, qint8 numLengthBytes, quint64 chunkLength);
+	ClockOffsetChunk(QDataStream &in, quint64 chunkPosition, quint64 chunkLength);
 
 	QString getName();
 
@@ -154,7 +154,7 @@ class BoundaryChunk : public XDFChunk
 public:
 	quint8 * chunkData;
 
-	BoundaryChunk(QDataStream &in, quint64 chunkPosition, qint8 numLengthBytes, quint64 chunkLength);
+	BoundaryChunk(QDataStream &in, quint64 chunkPosition, quint64 chunkLength);
 
 	QString getName();
 
@@ -173,7 +173,7 @@ public:
 	QString chunkData;
 	qint32 streamID;
 
-	StreamFooterChunk(QDataStream &in, quint64 chunkPosition, qint8 numLengthBytes, quint64 chunkLength);
+	StreamFooterChunk(QDataStream &in, quint64 chunkPosition, quint64 chunkLength);
 
 	QString getName();
 
@@ -192,7 +192,7 @@ public:
 	char * chunkData;
 	quint16 thisChunkTag;
 
-	UnrecognizedChunk(QDataStream &in, quint64 chunkPosition, qint8 numLengthBytes, quint64 chunkLength, quint16 chunkTag);
+	UnrecognizedChunk(QDataStream &in, quint64 chunkPosition, quint64 chunkLength, quint16 chunkTag);
 
 	QString getName();
 
