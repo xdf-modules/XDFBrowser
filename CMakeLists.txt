@@ -37,6 +37,7 @@ target_link_libraries(${PROJECT_NAME}
 	LSL::lsl
 )
 
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_auto_type cxx_noexcept)
 
 installLSLApp(${PROJECT_NAME})
 # installLSLAuxFiles(${PROJECT_NAME}
