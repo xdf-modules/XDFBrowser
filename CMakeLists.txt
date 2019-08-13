@@ -3,6 +3,8 @@ project(XDFBrowser
 	LANGUAGES CXX
 	VERSION 1.12.0)
 
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
 find_package(Qt5 REQUIRED COMPONENTS Widgets)
 
 add_executable(${PROJECT_NAME} MACOSX_BUNDLE WIN32
