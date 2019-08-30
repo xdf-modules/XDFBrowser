@@ -25,16 +25,12 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
-    
+class MainWindow : public QMainWindow {
+	Q_OBJECT
 public:
 	explicit MainWindow(QWidget *parent = nullptr, const char* filename = nullptr);
-    ~MainWindow();
+	~MainWindow() noexcept override;
 
-
-    
 private slots:
     void on_actionOpen_triggered();
 	void on_actionClose_triggered();

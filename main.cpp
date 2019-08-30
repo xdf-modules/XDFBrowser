@@ -8,13 +8,9 @@ Written by Matthew Grivich, SCCN/UCSD, May 2014.
 *******************************************************************************************/
 
 #include <QApplication>
-#include "mainwindow.h"
-
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
+int main(int argc, char *argv[]) {
+	QApplication a(argc, argv);
 	MainWindow w(nullptr, argc > 1 ? argv[1] : nullptr);
-    w.show();
-    
-    return a.exec();
+	w.show();
+	return a.exec();
 }
