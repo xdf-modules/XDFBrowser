@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(XDFBrowser
 	LANGUAGES CXX
-	VERSION 1.12.0)
+	VERSION 1.13.1)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -21,3 +21,14 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_auto_type cxx_noexcept)
+
+if (WIN32)
+	get_target_property(QT5_QMAKE_EXECUTABLE Qt5::qmake IMPORTED_LOCATION)
+	get_filename_component(QT5_WINDEPLOYQT_EXECUTABLE ${QT5_QMAKE_EXECUTABLE} PATH)
+	set(QT5_WINDEPLOYQT_EXECUTABLE "${QT5_WINDEPLOYQT_EXECUTABLE}/windeployqt.exe")
+
+	add_custom_command(
+		TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${QT5_WINDEPLOYQT_EXECUTABLE} --qmldir
+			${CMAKE_SOURCE_DIR} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+endif(WIN32)
