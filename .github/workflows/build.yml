@@ -50,3 +50,20 @@ jobs:
         with:
           name: XDFBrowser-windows-x64
           path: XDFBrowser-windows-x64.zip
+
+  release:
+    name: Upload to Release
+    needs: build-windows
+    if: github.event_name == 'release' && !failure() && !cancelled()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/XDFBrowser-windows-x64/*.zip
