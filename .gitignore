@@ -5,3 +5,6 @@ ui_*.h
 /CMakeSettings.json
 /.vs/
 /out/
+
+.claude
+CLAUDE.md

@@ -1,0 +1,69 @@
+name: Build
+
+on:
+  push:
+    branches: [master, main, ci]
+    tags: ['v*']
+  pull_request:
+    branches: [master, main]
+  workflow_dispatch:
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build-windows:
+    name: Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8.*'
+          cache: true
+
+      - name: Configure
+        run: >
+          cmake -S . -B build
+          -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+          -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install
+
+      - name: Build
+        run: cmake --build build --config ${{ env.BUILD_TYPE }} --parallel
+
+      - name: Install
+        run: cmake --install build --config ${{ env.BUILD_TYPE }}
+
+      - name: Deploy Qt runtime
+        run: windeployqt --release "${{ github.workspace }}/install/XDFBrowser.exe"
+
+      - name: Package
+        run: Compress-Archive -Path "${{ github.workspace }}/install/*" -DestinationPath "XDFBrowser-windows-x64.zip"
+        shell: pwsh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: XDFBrowser-windows-x64
+          path: XDFBrowser-windows-x64.zip
+
+  release:
+    name: Upload to Release
+    needs: build-windows
+    if: github.event_name == 'release' && !failure() && !cancelled()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/XDFBrowser-windows-x64/*.zip
